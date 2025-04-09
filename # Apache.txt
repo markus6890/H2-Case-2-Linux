@@ -1,0 +1,45 @@
+# Apache
+sudo dnf install -y httpd
+sudo systemctl enable --now httpd
+
+# MariaDB
+sudo dnf install -y mariadb-server
+sudo systemctl enable --now mariadb
+sudo mysql_secure_installation
+
+# PHP
+sudo dnf install -y php php-mysqlnd
+sudo systemctl restart httpd
+
+# Test
+echo "<?php phpinfo(); ?>" | sudo tee /var/www/html/info.php
+
+
+sudo mkdir -p /var/www/html/localrepo
+sudo cp /etc/yum.repos.d/*.repo /var/www/html/localrepo/
+
+# Konfigurationsfil
+cat <<EOF | sudo tee /etc/yum.repos.d/local.repo
+[localrepo]
+name=Local Repository
+baseurl=file:///var/www/html/localrepo
+enabled=1
+gpgcheck=0
+EOF
+
+
+echo "dnf update -y" | at now + 1 minute
+
+
+crontab -e
+# Tilføj linje:
+0 2 * * * /usr/local/bin/backup_to_git.sh
+
+# Initialiser repo
+cd /var/www/html
+git init
+git add .
+git commit -m "Initial commit of website"
+# Push til ekstern (eksempel)
+git remote add origin git@github.com:brugernavn/repo.git
+git push -u origin master

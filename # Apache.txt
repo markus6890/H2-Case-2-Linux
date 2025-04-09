@@ -43,3 +43,36 @@ git commit -m "Initial commit of website"
 # Push til ekstern (eksempel)
 git remote add origin git@github.com:brugernavn/repo.git
 git push -u origin master
+
+
+#!/bin/bash
+
+# === Konfiguration ===
+WEB_DIR="/var/www/html"
+BACKUP_DIR="/root/website_backup"
+DATE=$(date +"%Y%m%d_%H%M")
+GIT_REPO_DIR="$BACKUP_DIR/site_backups"
+REPO_URL="git@github.com:markus6890/H2-Case-2-Linux.git"  # Skift evt. URL'en
+
+# === Forbered backup-mappe ===
+mkdir -p "$GIT_REPO_DIR"
+BACKUP_PATH="$GIT_REPO_DIR/backup_$DATE"
+mkdir -p "$BACKUP_PATH"
+
+# === Kopiér hjemmeside ===
+cp -r "$WEB_DIR" "$BACKUP_PATH"
+
+# === Initialiser Git-repo hvis nødvendigt ===
+cd "$GIT_REPO_DIR" || exit 1
+
+if [ ! -d ".git" ]; then
+  git init
+  git remote add origin "$REPO_URL"
+  git branch -M main
+fi
+
+# === Tilføj, commit og push ændringer ===
+git add .
+git commit -m "Backup af website $DATE"
+git pull origin main --rebase  # Træk evt. ændringer fra GitHub
+git push origin main

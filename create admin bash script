@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Tjek om scriptet køres som root
+if [ "$EUID" -ne 0 ]; then
+    echo "Kør venligst dette script som root."
+    exit 1
+fi
+
+# Tjek om brugernavn er givet som argument
+if [ -z "$1" ]; then
+    echo "Brug: $0 <brugernavn>"
+    exit 1
+fi
+
+BRUGERNAVN="$1"
+
+# Spørg efter adgangskode (skjult input)
+read -s -p "Indtast adgangskode for brugeren '$BRUGERNAVN': " ADGANGSKODE
+echo
+read -s -p "Gentag adgangskoden: " ADGANGSKODE2
+echo
+
+# Tjek om adgangskoderne matcher
+if [ "$ADGANGSKODE" != "$ADGANGSKODE2" ]; then
+    echo "Adgangskoderne matcher ikke. Afbryder."
+    exit 1
+fi
+
+# Tjek om brugeren allerede findes
+if id "$BRUGERNAVN" &>/dev/null; then
+    echo "Brugeren '$BRUGERNAVN' findes allerede."
+    exit 1
+fi
+
+# Opret bruger og sæt adgangskode
+useradd -m -s /bin/bash "$BRUGERNAVN"
+echo "$BRUGERNAVN:$ADGANGSKODE" | chpasswd
+
+# Tilføj bruger til wheel-gruppen (sudo)
+usermod -aG wheel "$BRUGERNAVN"
+
+# Installer sudo hvis nødvendigt
+if ! command -v sudo &>/dev/null; then
+    echo "sudo ikke fundet, forsøger at installere..."
+    dnf install -y sudo
+fi
+
+# Sikre at wheel-gruppen har sudo-rettigheder
+if ! grep -q "^%wheel ALL=(ALL) ALL" /etc/sudoers; then
+    echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
+fi
+
+echo "Brugeren '$BRUGERNAVN' er oprettet med sudo-rettigheder."

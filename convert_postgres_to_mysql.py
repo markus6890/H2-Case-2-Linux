@@ -1,5 +1,6 @@
 import re
-
+import gzip
+import os
 type_mapping = {
     "SERIAL": "INT AUTO_INCREMENT",
     "BIGSERIAL": "BIGINT AUTO_INCREMENT",

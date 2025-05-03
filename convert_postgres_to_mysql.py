@@ -53,6 +53,3 @@ output_file = input("Enter the path for the converted MySQL schema file: ")
 
 # Call the function to convert
 convert_pg_to_mysql(input_file, output_file)
-
-
-convert_pg_to_mysql(input_file, output_file)

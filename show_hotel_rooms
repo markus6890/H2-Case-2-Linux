@@ -1,3 +1,4 @@
+<?php
 function show_hotel_rooms() {
     global $wpdb;
     $output = '';
@@ -22,3 +23,4 @@ function show_hotel_rooms() {
     return $output;
 }
 add_shortcode('hotel_rooms', 'show_hotel_rooms');
+?>

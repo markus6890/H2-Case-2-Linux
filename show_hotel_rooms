@@ -1,0 +1,24 @@
+function show_hotel_rooms() {
+    global $wpdb;
+    $output = '';
+
+    $rooms = $wpdb->get_results("SELECT * FROM wp_rooms");
+
+    if ($rooms) {
+        $output .= '<div class="room-grid">';
+        foreach ($rooms as $room) {
+            $output .= '<div class="room-card">';
+            $output .= '<h3>' . esc_html($room->name) . '</h3>';
+            $output .= '<p>Room Type: ' . esc_html($room->room_type) . '</p>';
+            $output .= '<p>Price: ' . esc_html($room->pricing) . ' DKK per night</p>';
+            $output .= '<p>Available: ' . esc_html($room->available) . '</p>';
+            $output .= '</div>';
+        }
+        $output .= '</div>';
+    } else {
+        $output .= '<p>No rooms available right now.</p>';
+    }
+
+    return $output;
+}
+add_shortcode('hotel_rooms', 'show_hotel_rooms');

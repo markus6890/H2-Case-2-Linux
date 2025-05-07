@@ -2,7 +2,7 @@ function show_hotel_rooms() {
     global $wpdb;
     $output = '';
 
-    $rooms = $wpdb->get_results("SELECT * FROM wp_rooms");
+    $rooms = $wpdb->get_results("SELECT * FROM rooms");
 
     if ($rooms) {
         $output .= '<div class="room-grid">';

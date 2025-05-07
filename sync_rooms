@@ -1,0 +1,65 @@
+<?php
+/*
+Plugin Name: Sync Rooms to WP Hotel Booking
+Description: Sync rooms and availability from custom database to WP Hotel Booking plugin.
+Version: 1.0
+Author: Your Name
+*/
+
+function sync_rooms_to_wp_hotel_booking() {
+    global $wpdb;
+
+    // Step 1: Retrieve rooms from your rooms table
+    // Replace 'rooms' with the actual name of your rooms table
+    $your_rooms_data = $wpdb->get_results("SELECT * FROM rooms");
+
+    // Step 2: Set a fixed range of dates for availability (e.g., next 30 days)
+    $start_date = date('Y-m-d'); // Today
+    $end_date = date('Y-m-d', strtotime('+30 days')); // 30 days from today
+
+    // Step 3: Loop through the rooms and insert data into WP Hotel Booking
+    foreach ($your_rooms_data as $room) {
+        // Check if the room is available (availability = 1)
+        if ($room->available == 1) {
+            // Set default values for missing fields (description and capacity)
+            $room_description = 'Comfortable room with basic amenities.'; // Default description
+            $room_capacity = 2; // Default capacity
+
+            // Step 4: Insert room data into WP Hotel Booking rooms table
+            // Assuming 'wp_hotel_booking_rooms' is the table in WP
+            $wpdb->insert(
+                'wp_hotel_booking_rooms',
+                array(
+                    'name' => $room->name, // Room name from your table
+                    'description' => $room_description,  // Default description
+                    'room_type' => $room->room_type,  // Room type from your table
+                    'capacity' => $room_capacity,  // Default capacity
+                    'pricing' => $room->pricing,  // Pricing from your table
+                    'hotel_id' => $room->hotel_id,  // Hotel ID from your table
+                )
+            );
+
+            // Get the room ID in WP Hotel Booking after inserting
+            $room_id_wp = $wpdb->insert_id;
+
+            // Step 5: Insert availability data based on the available boolean (available = 1 means available)
+            // Insert availability for the next 30 days
+            $current_date = $start_date;
+            while (strtotime($current_date) <= strtotime($end_date)) {
+                $wpdb->insert(
+                    'wp_hotel_booking_room_availability',
+                    array(
+                        'room_id' => $room_id_wp, // Room ID in WP
+                        'available_date' => $current_date,
+                        'availability' => 1, // Mark as available
+                    )
+                );
+                // Move to the next day
+                $current_date = date('Y-m-d', strtotime($current_date . ' +1 day'));
+            }
+        }
+    }
+}
+
+// Call this function to sync your rooms and availability
+sync_rooms_to_wp_hotel_booking();

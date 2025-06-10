@@ -48,21 +48,6 @@ This setup allows AD users to authenticate on the Rocky Linux server.
 
 
 
-[sssd]
-domains = Edelhardts.no
-config_file_version = 2
-services = nss, pam
-
-[domain/Edelhardts.no]
-default_shell = /bin/bash
-krb5_store_password_if_offline = True
-cache_credentials = True
-krb5_realm = EDELHARDTS.NO
-realmd_tags = manages-system joined-with-adcli
-id_provider = ad
-fallback_homedir = /home/%u@%d
-ad_domain = Edelhardts.no
-use_fully_qualified_names = True
-ldap_id_mapping = True
-access_provider = ad
-
+  default_tkt_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
+  default_tgs_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
+  permitted_enctypes   = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96

@@ -1,8 +1,51 @@
-From github.com:markus6890/H2-Case-2-Linux
- * branch            main       -> FETCH_HEAD
-Current branch mai is up to date.
-error: src refspec main does not match any
-error: failed to push some refs to 'github.com:markus6890/H2-Case-2-Linux.git'
+To connect a Rocky Linux server to a domain and use Active Directory Domain Services (ADDS) users, follow these steps:
+
+### 1. Install Required Packages
+Run the following commands to install necessary tools:
+
+sudo dnf install realmd sssd sssd-tools samba-common-tools krb5-workstation oddjob oddjob-mkhomedir adcli
+
+
+### 2. Discover the Domain
+Use `realmd` to discover the domain:
+
+sudo realm discover <domain-name>
+
+Replace `<domain-name>` with your AD domain (e.g., `example.com`).
+
+### 3. Join the Domain
+Join the domain using the following command:
+
+sudo realm join --user=<domain-admin-user> <domain-name>
+
+Replace `<domain-admin-user>` with a domain admin username and `<domain-name>` with your AD domain.
+
+### 4. Verify Domain Connection
+Check if the server is connected to the domain:
+
+realm list
+
+
+Set proper permissions for the file:
+
+sudo chmod 600 /etc/sssd/sssd.conf
+
+
+### 6. Restart Services
+Restart the SSSD service:
+
+sudo systemctl restart sssd
+
+
+### 7. Test AD User Login
+Try logging in with an AD user:
+
+su - <AD-username>
+
+Replace `<AD-username>` with an Active Directory username.
+
+This setup allows AD users to authenticate on the Rocky Linux server.
+
 
 
 [sssd]

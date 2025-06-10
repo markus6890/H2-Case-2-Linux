@@ -3,3 +3,23 @@ From github.com:markus6890/H2-Case-2-Linux
 Current branch mai is up to date.
 error: src refspec main does not match any
 error: failed to push some refs to 'github.com:markus6890/H2-Case-2-Linux.git'
+
+
+[sssd]
+domains = Edelhardts.no
+config_file_version = 2
+services = nss, pam
+
+[domain/Edelhardts.no]
+default_shell = /bin/bash
+krb5_store_password_if_offline = True
+cache_credentials = True
+krb5_realm = EDELHARDTS.NO
+realmd_tags = manages-system joined-with-adcli
+id_provider = ad
+fallback_homedir = /home/%u@%d
+ad_domain = Edelhardts.no
+use_fully_qualified_names = True
+ldap_id_mapping = True
+access_provider = ad
+

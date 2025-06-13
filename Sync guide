@@ -133,3 +133,8 @@ A systemd service file to auto-start SymmetricDS on Rocky Linux?
 Help defining multiple tables or filtering sync?
 
 Let me know and I’ll tailor the next step for your setu
+
+docker run -d --name symB \
+  -v /opt/symmetricds-b/conf/symmetric.properties:/opt/symmetricds/conf/symmetric.properties \
+  -p 31415:31415 \
+  symmetricds/symmetricds

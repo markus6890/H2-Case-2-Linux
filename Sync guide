@@ -1,0 +1,126 @@
+Step 1: Prepare MariaDB on Both Sites
+Ensure:
+
+Same schema on both servers.
+
+Create a sync user:
+
+sql
+Kopiér
+Rediger
+CREATE USER 'sync_user'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON *.* TO 'sync_user'@'%';
+FLUSH PRIVILEGES;
+🔹 Step 2: Install SymmetricDS on Rocky Linux (Site A)
+bash
+Kopiér
+Rediger
+# Install Java
+sudo dnf install java-17-openjdk -y
+
+# Download SymmetricDS
+wget https://sourceforge.net/projects/symmetricds/files/symmetricds/3.14/symmetric-server-3.14.zip
+unzip symmetric-server-3.14.zip
+cd symmetric-server-3.14
+
+# Configure
+cp engines/template.properties engines/rocky.properties
+nano engines/rocky.properties
+Example: engines/rocky.properties
+
+ini
+Kopiér
+Rediger
+engine.name=rocky
+group.id=store
+external.id=A
+
+db.driver=org.mariadb.jdbc.Driver
+db.url=jdbc:mariadb://localhost:3306/yourdb
+db.user=sync_user
+db.password=your_password
+
+registration.url=http://<docker-site-ip>:31415/sync/store-B
+sync.url=http://<rocky-site-ip>:31415/sync/store-A
+
+auto.create.database=true
+Start it:
+
+bash
+Kopiér
+Rediger
+./bin/sym --engine rocky
+🔹 Step 3: Run SymmetricDS in Docker (Site B)
+On Docker host (Site B):
+
+bash
+Kopiér
+Rediger
+docker run -d --name symB \
+  -v /path/to/symmetric.properties:/opt/symmetricds/conf/symmetric.properties \
+  -p 31415:31415 \
+  symmetricds/symmetricds
+Docker: /path/to/symmetric.properties
+
+ini
+Kopiér
+Rediger
+engine.name=docker
+group.id=store
+external.id=B
+
+db.driver=org.mariadb.jdbc.Driver
+db.url=jdbc:mariadb://host.docker.internal:3306/yourdb
+db.user=sync_user
+db.password=your_password
+
+registration.url=http://<rocky-site-ip>:31415/sync/store-A
+sync.url=http://<docker-site-ip>:31415/sync/store-B
+
+auto.create.database=true
+host.docker.internal is used if MariaDB is outside the container (Docker Desktop). On Linux, use the actual host IP (e.g., 192.168.x.x).
+
+🔹 Step 4: Trigger & Router Setup (only once)
+On one node only (Site A):
+
+sql
+Kopiér
+Rediger
+-- Define what to sync
+INSERT INTO sym_trigger 
+(trigger_id, source_table, channel_id, sync_on_insert, sync_on_update, sync_on_delete) 
+VALUES ('mytable-trigger', 'mytable', 'default', 1, 1, 1);
+
+-- Define sync routes
+INSERT INTO sym_router 
+(router_id, source_node_group_id, target_node_group_id, router_type, create_time) 
+VALUES ('store-router', 'store', 'store', 'default', current_timestamp);
+
+-- Link trigger to router
+INSERT INTO sym_trigger_router (trigger_id, router_id) 
+VALUES ('mytable-trigger', 'store-router');
+🔹 Step 5: Test Sync
+Insert data on Site A → it appears on Site B.
+
+Insert data on Site B → it appears on Site A.
+
+Disconnect Site B → make inserts on Site A → reconnect → sync happens automatically.
+
+✅ Final Checklist
+Task	Done?
+Java installed on Rocky Linux	✅
+SymmetricDS running on both ends	✅
+Network ports (31415) open	✅
+MariaDB sync user created	✅
+symmetric.properties configured	✅
+Sync tested (offline/online)	✅
+
+Would you like:
+
+A ready-to-deploy docker-compose.yml for the Docker site?
+
+A systemd service file to auto-start SymmetricDS on Rocky Linux?
+
+Help defining multiple tables or filtering sync?
+
+Let me know and I’ll tailor the next step for your setu

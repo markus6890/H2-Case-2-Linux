@@ -5,16 +5,12 @@ Same schema on both servers.
 
 Create a sync user:
 
-sql
-Kopiér
-Rediger
+
 CREATE USER 'sync_user'@'%' IDENTIFIED BY 'your_password';
 GRANT ALL PRIVILEGES ON *.* TO 'sync_user'@'%';
 FLUSH PRIVILEGES;
 🔹 Step 2: Install SymmetricDS on Rocky Linux (Site A)
-bash
-Kopiér
-Rediger
+
 # Install Java
 sudo dnf install java-17-openjdk -y
 
@@ -46,16 +42,29 @@ sync.url=http://<rocky-site-ip>:31415/sync/store-A
 auto.create.database=true
 Start it:
 
-bash
-Kopiér
-Rediger
+
 ./bin/sym --engine rocky
 🔹 Step 3: Run SymmetricDS in Docker (Site B)
 On Docker host (Site B):
 
-bash
-Kopiér
-Rediger
+mkdir -p /opt/symmetricds-b/conf
+nano /opt/symmetricds-b/conf/symmetric.properties
+
+engine.name=symB
+group.id=store
+external.id=B
+
+db.driver=org.mariadb.jdbc.Driver
+db.url=jdbc:mariadb://<mariadb-host-ip>:3306/mydb
+db.user=sync_user
+db.password=my_password
+
+registration.url=http://<rocky-site-ip>:31415/sync/store-A
+sync.url=http://<docker-host-ip>:31415/sync/store-B
+
+auto.create.database=true
+
+
 docker run -d --name symB \
   -v /path/to/symmetric.properties:/opt/symmetricds/conf/symmetric.properties \
   -p 31415:31415 \

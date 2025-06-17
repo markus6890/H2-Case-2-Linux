@@ -78,18 +78,35 @@ VALUES ('trigger1', 'router1'), ('trigger2', 'router1'), ('trigger3','router1');
  default_tgs_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
  permitted_enctypes   = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
 
-[kris@FIL-SRV scripts]$ sudo ./remote_backup.sh 
-tar: daily.0/web-serv/back/var/lib/mysql/mysql.sock: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/nss: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/pac: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/pam: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/private/pam: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.29769: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.76248: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.932: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.944: socket ignored
-tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-monitor: socket ignored
-./remote_backup.sh: line 22: : No such file or directory
-ssh: Could not resolve hostname : Name or service not known
-Connection closed
+#!/bin/bash
+
+SOURCE_DIR="/data/compress_backup"
+SNAPSHOT_DIR="/data/backup/daily.0"
+ARCHIVE_NAME="daily.0.tar.gz"
+ARCHIVE_PATH="$SOURCE_DIR/$ARCHIVE_NAME"
+REMOTE_USER="root"
+REMOTE_HOST="172.16.2.2"
+REMOTE_PATH="/data/compress_backup"
+LOGFILE="/var/log/rsnap_transfer.log"
+
+mkdir -p "$SOURCE_DIR"
+
+echo "[$(date)] Starting compression of $SNAPSHOT_DIR" >> "$LOGFILE"
+
+sudo tar -czf "$ARCHIVE_PATH" -C "$(dirname "$SNAPSHOT_DIR")" "$(basename "$SNAPSHOT_DIR")"
+
+if [ $? -ne 0 ]; then
+  echo "[$(date)] Compression fucked up" >> "$LOGFILE"
+  exit 1
+fi
+echo "[$(date)] Archive created at $ARCHIVE_PATH" >> "$LOGPATH"
+
+sudo scp "$ARCHIVE_PATH" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH"
+
+if [ $? -ne 0 ]; then
+  echo "[$(date)] SCP transfer made an uupsi and failed" >> "$LOGFILE"
+  exit 2
+fi
+
+echo "[$(date)] Backup MADE IT TO FREEDOM AT $REMOTE_HOST:$REMOTE_PATH" >> "$LOGFILE"
 

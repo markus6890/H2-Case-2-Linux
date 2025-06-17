@@ -56,6 +56,22 @@ This setup allows AD users to authenticate on the Rocky Linux server.
  renew_lifetime = 7d
  forwardable = true
  rdns = false
+
+INSERT INTO sym_trigger (trigger_id, source_table_name, channel_id, sync_on_insert, sync_on_update, sync_on_delete)
+VALUES ('trigger1', 'wp_hotel_booking_order_itemmeta', 'default', 1, 1, 1);
+
+INSERT INTO sym_trigger (trigger_id, source_table_name, channel_id, sync_on_insert, sync_on_update, sync_on_delete)
+VALUES ('trigger2', 'wp_hotel_booking_order_items', 'default', 1, 1, 1);
+
+INSERT INTO sym_trigger (trigger_id, source_table_name, channel_id, sync_on_insert, sync_on_update, sync_on_delete)
+VALUES ('trigger3', 'wp_hotel_booking_plans', 'default', 1, 1, 1);
+
+
+INSERT INTO sym_router (router_id, source_node_group_id, target_node_group_id, router_type, create_time)
+VALUES ('router1', 'edelhardts', 'edelhardts', 'default', NOW());
+
+INSERT INTO sym_trigger_router (trigger_id, router_id)
+VALUES ('trigger1', 'router1'), ('trigger2', 'router1'), ('trigger3','router1');
  udp_preference_limit = 0
 
  default_tkt_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96

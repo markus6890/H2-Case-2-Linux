@@ -62,3 +62,4 @@ This setup allows AD users to authenticate on the Rocky Linux server.
  default_tgs_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
  permitted_enctypes   = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
 
+0f0573ba80135f09515769544960d6dd343ccc2c500ee1dd9e25e6bb85357e46d925f603a33cbfee42c6c67989a0af2cf4f798d06ceb666ae8a8b56bc16b2c77

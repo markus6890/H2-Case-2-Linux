@@ -77,3 +77,19 @@ VALUES ('trigger1', 'router1'), ('trigger2', 'router1'), ('trigger3','router1');
  default_tkt_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
  default_tgs_enctypes = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
  permitted_enctypes   = aes256-cts-hmac-sha1-96 aes128-cts-hmac-sha1-96
+
+[kris@FIL-SRV scripts]$ sudo ./remote_backup.sh 
+tar: daily.0/web-serv/back/var/lib/mysql/mysql.sock: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/nss: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/pac: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/pam: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/private/pam: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.29769: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.76248: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.932: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-dp_Edelhardts.no.944: socket ignored
+tar: daily.0/web-serv/back/var/lib/sss/pipes/private/sbus-monitor: socket ignored
+./remote_backup.sh: line 22: : No such file or directory
+ssh: Could not resolve hostname : Name or service not known
+Connection closed
+
